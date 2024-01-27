@@ -3,7 +3,7 @@ import readline from "node:readline";
 import * as TTY from "node:tty";
 
 // Import Third-party Dependencies
-// import wcwidth from "@topcli/wcwidth";
+import wcwidth from "@topcli/wcwidth";
 import getCursorPosition from "get-cursor-position";
 
 export class TTYCursor {
@@ -27,19 +27,23 @@ export class TTYCursor {
     readline.cursorTo(this.stream, this.x, this.y);
   }
 
+  writeRaw(input: string) {
+    this.stream.write(input.replace(/\r?\n|\r/g, ""));
+  }
+
   write(input: string) {
     this.jump();
 
     const dy = (input.match(/\n/g) || "").length;
     this.y += dy;
-    this.x = dy === 0 ? this.x + input.length : 0;
+    this.x = dy === 0 ? this.x + wcwidth(input) : 0;
 
-    this.stream.write(input.replace(/\r?\n|\r/g, ""));
+    this.writeRaw(input);
   }
 
   erase(input: string) {
     this.jump();
-    const inputLength = input.length;
+    const inputLength = wcwidth(input);
     this.x -= inputLength;
 
     readline.moveCursor(this.stream, -inputLength, 0);

@@ -3,6 +3,9 @@ import { Action } from "./Action.class.js";
 import { Write } from "./Write.class.js";
 import { TTYCursor } from "../cursor.js";
 
+// Import Third-party Dependencies
+import wcswidth from "@topcli/wcwidth";
+
 export type EraseOptions = {
   length?: number;
   steps?: number;
@@ -34,8 +37,8 @@ export class Erase extends Action {
       mustMoveCursor && cursor.up(writeAction.length);
       let currLength = 0;
 
-      for (const { segment } of writeAction.getIterableSegmentsReversed()) {
-        currLength += segment.length;
+      for (const segment of writeAction.getIterableSegmentsReversed()) {
+        currLength += wcswidth(segment);
 
         cursor.erase(segment);
         writeAction.sleep();
@@ -62,8 +65,8 @@ export class Erase extends Action {
       mustMoveCursor && cursor.up(writeAction.length);
       let currLength = 0;
 
-      for (const { segment } of writeAction.getIterableSegmentsReversed()) {
-        currLength += segment.length;
+      for (const segment of writeAction.getIterableSegmentsReversed()) {
+        currLength += wcswidth(segment);
 
         cursor.erase(segment);
         await writeAction.sleepAsync();

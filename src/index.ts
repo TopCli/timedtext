@@ -10,6 +10,7 @@ import {
   EraseOptions
 } from "./actions/index.js";
 import { TTYCursor } from "./cursor.js";
+import { AnsiSegmenter } from "./class/AnsiSegmenter.class.js";
 
 // CONSTANTS
 const kDefaultLocal = "en";
@@ -29,7 +30,7 @@ export type EraseTextOptions = EraseOptions;
 
 export class TimedText {
   private cursor: TTYCursor;
-  private segmenter: Intl.Segmenter;
+  private segmenter: AnsiSegmenter;
 
   private lastActionIsAFullErase = false;
   private writeActionCount = 0;
@@ -48,7 +49,7 @@ export class TimedText {
     this.cursor = new TTYCursor(stream);
     const { local, ...segmenterOptions } = segmenter;
 
-    this.segmenter = new Intl.Segmenter(
+    this.segmenter = new AnsiSegmenter(
       local,
       segmenterOptions
     );
@@ -60,10 +61,10 @@ export class TimedText {
     let segmenter = this.segmenter;
     if (options.segmenter) {
       const { local, ...segmenterOptions } = options.segmenter;
-      segmenter = new Intl.Segmenter(local, segmenterOptions);
+      segmenter = new AnsiSegmenter(local, segmenterOptions);
     }
 
-    this.#actions.push(new Write(input, { segmenter, interval }));
+    this.#actions.push(new Write([input], { segmenter, interval }));
     this.lastActionIsAFullErase = false;
     this.writeActionCount++;
 
@@ -139,4 +140,6 @@ export class TimedText {
     }
   }
 }
+
+export { AnsiSegmenter };
 export default TimedText;
