@@ -9,7 +9,7 @@ import {
   Erase,
   EraseOptions
 } from "./actions/index.js";
-import { TTYCursor } from "./cursor.js";
+import { Cursor } from "./cursor.js";
 import { AnsiSegmenter } from "./class/AnsiSegmenter.class.js";
 
 // CONSTANTS
@@ -29,7 +29,7 @@ export type WriteTextOptions = Omit<WriteOptions, "segmenter"> & { segmenter?: S
 export type EraseTextOptions = EraseOptions;
 
 export class TimedText {
-  private cursor: TTYCursor;
+  private cursor: Cursor;
   private segmenter: AnsiSegmenter;
 
   private lastActionIsAFullErase = false;
@@ -46,7 +46,7 @@ export class TimedText {
       }
     } = options;
 
-    this.cursor = new TTYCursor(stream);
+    this.cursor = new Cursor(stream);
     const { local, ...segmenterOptions } = segmenter;
 
     this.segmenter = new AnsiSegmenter(
@@ -96,7 +96,7 @@ export class TimedText {
   }
 
   jumpToEndCursor() {
-    this.cursor.jump();
+    this.cursor.jumpTo();
   }
 
   * #getPreviousWriteActions(id: number): Iterable<Write> {

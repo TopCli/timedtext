@@ -6,63 +6,96 @@ import * as TTY from "node:tty";
 import wcwidth from "@topcli/wcwidth";
 import getCursorPosition from "get-cursor-position";
 
-export class TTYCursor {
+export class Cursor {
   public x: number;
   public y: number;
-  public stream: TTY.WriteStream;
 
-  constructor(stream: TTY.WriteStream) {
-    this.#getPosition();
-    this.stream = stream;
+  public birthLocation: {
+    x: number;
+    y: number;
+  };
+  public output: TTY.WriteStream;
+
+  constructor(output: TTY.WriteStream) {
+    this.#getCursorPosition();
+    this.birthLocation = {
+      x: this.x,
+      y: this.y
+    };
+
+    this.output = output;
   }
 
-  #getPosition() {
+  reset(jumpToBirthLocation = false) {
+    this.x = this.birthLocation.x;
+    this.y = this.birthLocation.y;
+
+    if (jumpToBirthLocation) {
+      this.jumpTo();
+    }
+
+    return this;
+  }
+
+  #getCursorPosition() {
     const { row, col } = getCursorPosition.sync();
 
     this.x = col - 1;
     this.y = row - 1;
+
+    return this;
   }
 
-  jump() {
-    readline.cursorTo(this.stream, this.x, this.y);
+  moveTo(x = 0, y = 0) {
+    readline.moveCursor(this.output, x, y);
+
+    return this;
+  }
+
+  jumpTo(x = this.x, y = this.y) {
+    readline.cursorTo(this.output, x, y);
+
+    return this;
   }
 
   writeRaw(input: string) {
-    this.stream.write(input.replace(/\r?\n|\r/g, ""));
+    this.output.write(input.replace(/\r?\n|\r/g, ""));
+
+    return this;
   }
 
-  write(input: string) {
-    this.jump();
+  write(input: string, ansi = "") {
+    this.jumpTo();
 
     const dy = (input.match(/\n/g) || "").length;
     this.y += dy;
     this.x = dy === 0 ? this.x + wcwidth(input) : 0;
 
-    this.writeRaw(input);
+    return this.writeRaw(ansi + input);
   }
 
   erase(input: string) {
-    this.jump();
+    this.jumpTo();
     const inputLength = wcwidth(input);
     this.x -= inputLength;
 
-    readline.moveCursor(this.stream, -inputLength, 0);
-    readline.clearLine(this.stream, 1);
+    readline.moveCursor(this.output, -inputLength, 0);
+    readline.clearLine(this.output, 1);
   }
 
   up(dx = 0) {
-    this.jump();
+    this.jumpTo();
     this.x = dx;
     this.y -= 1;
 
-    readline.moveCursor(this.stream, dx, -1);
+    return this.moveTo(dx, -1);
   }
 
   down(dx = 0) {
-    this.jump();
+    this.jumpTo();
     this.x = dx;
     this.y += 1;
 
-    readline.moveCursor(this.stream, dx, 1);
+    return this.moveTo(dx, 1);
   }
 }

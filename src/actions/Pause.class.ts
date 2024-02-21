@@ -5,7 +5,7 @@ import timers from "node:timers/promises";
 // Import Internal Dependencies
 import { Action } from "./Action.class.js";
 import { sleep } from "../utils.js";
-import { TTYCursor } from "../cursor.js";
+import { Cursor } from "../cursor.js";
 
 export class Pause extends Action {
   public readonly name = "pause";
@@ -18,11 +18,11 @@ export class Pause extends Action {
     this.time = pauseTimeInMilliseconds;
   }
 
-  execute(_: TTYCursor): void {
+  execute(_: Cursor): void {
     sleep(this.time);
   }
 
-  async executeAsync(_: TTYCursor): Promise<void> {
+  async executeAsync(_: Cursor): Promise<void> {
     await timers.setTimeout(this.time);
   }
 }

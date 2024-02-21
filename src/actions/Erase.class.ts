@@ -1,7 +1,7 @@
 // Import Internal Dependencies
 import { Action } from "./Action.class.js";
 import { Write } from "./Write.class.js";
-import { TTYCursor } from "../cursor.js";
+import { Cursor } from "../cursor.js";
 
 // Import Third-party Dependencies
 import wcswidth from "@topcli/wcwidth";
@@ -24,7 +24,7 @@ export class Erase extends Action {
   }
 
   execute(
-    cursor: TTYCursor,
+    cursor: Cursor,
     actions: Iterable<Write>
   ): void {
     let numberOfSteps = 0;
@@ -52,7 +52,7 @@ export class Erase extends Action {
   }
 
   async executeAsync(
-    cursor: TTYCursor,
+    cursor: Cursor,
     actions: Iterable<Write>
   ): Promise<void> {
     let numberOfSteps = 0;

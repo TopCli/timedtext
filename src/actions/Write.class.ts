@@ -9,11 +9,12 @@ import wcswidth from "@topcli/wcwidth";
 // Import Internal Dependencies
 import { Action } from "./Action.class.js";
 import { sleep } from "../utils.js";
-import { TTYCursor } from "../cursor.js";
+import { Cursor } from "../cursor.js";
 import { AnsiSegmenter } from "../class/AnsiSegmenter.class.js";
 
 // CONSTANTS
 const kAnsiRegExp = ansiRegex();
+const kAnsiReset = `\x1b[0m`;
 
 export type WriteInput = {
   raw: string;
@@ -74,25 +75,47 @@ export class Write extends Action {
     return timers.setTimeout(this.interval);
   }
 
-  execute(cursor: TTYCursor): void {
+  execute(cursor: Cursor): void {
+    const lastAnsiSegments: string[] = [];
+
     for (const segment of this.getIterableSegments()) {
       if (kAnsiRegExp.test(segment)) {
-        cursor.writeRaw(segment);
+        if (segment.includes(kAnsiReset)) {
+          lastAnsiSegments.pop();
+        }
+        else {
+          lastAnsiSegments.push(segment);
+        }
+
+        cursor.writeRaw(segment.trim());
       }
       else {
-        cursor.write(segment);
+        const lastAnsiSegment = lastAnsiSegments.at(-1) ?? kAnsiReset;
+
+        cursor.write(segment, lastAnsiSegment);
         this.sleep();
       }
     }
   }
 
-  async executeAsync(cursor: TTYCursor): Promise<void> {
+  async executeAsync(cursor: Cursor): Promise<void> {
+    const lastAnsiSegments: string[] = [];
+
     for (const segment of this.getIterableSegments()) {
       if (kAnsiRegExp.test(segment)) {
+        if (segment.includes(kAnsiReset)) {
+          lastAnsiSegments.pop();
+        }
+        else {
+          lastAnsiSegments.push(segment);
+        }
+
         cursor.writeRaw(segment);
       }
       else {
-        cursor.write(segment);
+        const lastAnsiSegment = lastAnsiSegments.at(-1) ?? kAnsiReset;
+
+        cursor.write(segment, lastAnsiSegment);
         await this.sleepAsync();
       }
     }
