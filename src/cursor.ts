@@ -5,6 +5,10 @@ import * as TTY from "node:tty";
 // Import Third-party Dependencies
 import wcwidth from "@topcli/wcwidth";
 import getCursorPosition from "get-cursor-position";
+import ansiRegex from "ansi-regex";
+
+// CONSTANTS
+const kAnsiRegex = ansiRegex();
 
 export class Cursor {
   public x: number;
@@ -69,7 +73,7 @@ export class Cursor {
 
     const dy = (input.match(/\n/g) || "").length;
     this.y += dy;
-    this.x = dy === 0 ? this.x + wcwidth(input) : 0;
+    this.x = dy === 0 ? this.x + wcwidth(input.replace(kAnsiRegex, "")) : 0;
 
     return this.writeRaw(ansi + input);
   }

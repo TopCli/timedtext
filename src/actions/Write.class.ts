@@ -3,17 +3,16 @@
 import timers from "node:timers/promises";
 
 // Import Third-party Dependencies
-import ansiRegex from "ansi-regex";
 import wcswidth from "@topcli/wcwidth";
 
 // Import Internal Dependencies
 import { Action } from "./Action.class.js";
 import { sleep } from "../utils.js";
 import { Cursor } from "../cursor.js";
-import { AnsiSegmenter } from "../class/AnsiSegmenter.class.js";
+import { AnsiSegmenter } from "../index.js";
+import { AnsiSegments } from "../class/AnsiSegments.class.js";
 
 // CONSTANTS
-const kAnsiRegExp = ansiRegex();
 const kAnsiReset = `\x1b[0m`;
 
 export type WriteInput = {
@@ -53,7 +52,7 @@ export class Write extends Action {
     }
   }
 
-  * getIterableSegments(): IterableIterator<string> {
+  * getIterableSegments(): IterableIterator<AnsiSegments> {
     for (const input of this.inputs) {
       yield* this.segmenter.segment(input.raw);
     }
@@ -61,7 +60,7 @@ export class Write extends Action {
 
   getIterableSegmentsReversed(): string[] {
     return Array.from(this.getIterableSegments())
-      .filter((segment) => !kAnsiRegExp.test(segment))
+      .map((segment) => segment.segment)
       .reverse();
   }
 
@@ -76,48 +75,34 @@ export class Write extends Action {
   }
 
   execute(cursor: Cursor): void {
-    const lastAnsiSegments: string[] = [];
+    const ansiCodesMemory: string[] = [];
 
     for (const segment of this.getIterableSegments()) {
-      if (kAnsiRegExp.test(segment)) {
-        if (segment.includes(kAnsiReset)) {
-          lastAnsiSegments.pop();
-        }
-        else {
-          lastAnsiSegments.push(segment);
-        }
+      const lastMemoizedAnsiCode = ansiCodesMemory.at(-1) ?? kAnsiReset;
+      cursor.write(segment.toString(), lastMemoizedAnsiCode);
 
-        cursor.writeRaw(segment.trim());
+      const lastSegmentAnsiCode = segment.last;
+      if (lastSegmentAnsiCode) {
+        ansiCodesMemory.push(lastSegmentAnsiCode);
       }
-      else {
-        const lastAnsiSegment = lastAnsiSegments.at(-1) ?? kAnsiReset;
 
-        cursor.write(segment, lastAnsiSegment);
-        this.sleep();
-      }
+      this.sleep();
     }
   }
 
   async executeAsync(cursor: Cursor): Promise<void> {
-    const lastAnsiSegments: string[] = [];
+    const ansiCodesMemory: string[] = [];
 
     for (const segment of this.getIterableSegments()) {
-      if (kAnsiRegExp.test(segment)) {
-        if (segment.includes(kAnsiReset)) {
-          lastAnsiSegments.pop();
-        }
-        else {
-          lastAnsiSegments.push(segment);
-        }
+      const lastMemoizedAnsiCode = ansiCodesMemory.at(-1) ?? kAnsiReset;
+      cursor.write(segment.toString(), lastMemoizedAnsiCode);
 
-        cursor.writeRaw(segment);
+      const lastSegmentAnsiCode = segment.last;
+      if (lastSegmentAnsiCode) {
+        ansiCodesMemory.push(lastSegmentAnsiCode);
       }
-      else {
-        const lastAnsiSegment = lastAnsiSegments.at(-1) ?? kAnsiReset;
 
-        cursor.write(segment, lastAnsiSegment);
-        await this.sleepAsync();
-      }
+      await this.sleepAsync();
     }
   }
 }

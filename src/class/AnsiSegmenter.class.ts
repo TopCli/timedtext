@@ -1,6 +1,8 @@
-/* eslint-disable no-cond-assign */
-// Import Third-party Dependencies
-import ansiRegex from "ansi-regex";
+// Import Internal Dependencies
+import {
+  extractAnsiCodesFromSegment
+} from "../utils/extractAnsiCodesFromSegment.js";
+import { AnsiSegments } from "./AnsiSegments.class.js";
 
 export class AnsiSegmenter {
   public segmenter: Intl.Segmenter;
@@ -12,57 +14,40 @@ export class AnsiSegmenter {
     this.segmenter = new Intl.Segmenter(locales, options);
   }
 
-  * segment(
+  segment(
     nonSegmentedInput: string
-  ): IterableIterator<string> {
-    for (const { text, type } of splitAnsiString(nonSegmentedInput)) {
-      if (type === "ansi") {
-        yield text;
-      }
-      else {
-        for (const { segment } of this.segmenter.segment(text)) {
-          yield segment;
+  ): AnsiSegments[] {
+    const { rawSegment, codes } = extractAnsiCodesFromSegment(nonSegmentedInput);
+
+    const segments: (Intl.SegmentData | AnsiSegments)[] = [
+      ...this.segmenter.segment(rawSegment)
+    ];
+
+    for (const code of codes) {
+      let currentSegmentOffset = 0;
+
+      for (let id = 0; id < segments.length; id++) {
+        const segmentData = segments[id];
+        currentSegmentOffset += segmentData.segment.length;
+
+        if (code.offset > currentSegmentOffset) {
+          continue;
         }
+
+        if (segmentData instanceof AnsiSegments) {
+          segmentData.push(code);
+        }
+        else {
+          const offset = currentSegmentOffset - segmentData.segment.length;
+          segments[id] = new AnsiSegments(segmentData, offset).push(code);
+        }
+
+        break;
       }
     }
-  }
-}
 
-type splitAnsiResult =
-  { text: string, type: "text" } |
-  { text: string, type: "ansi" };
-
-function* splitAnsiString(
-  input: string
-): IterableIterator<splitAnsiResult> {
-  const regexp = ansiRegex();
-  let lastIndex = 0;
-
-  for (
-    let result: RegExpExecArray | null;
-    result = regexp.exec(input);
-    result !== null
-  ) {
-    if (lastIndex < result.index) {
-      yield {
-        text: input.slice(lastIndex, result.index),
-        type: "text"
-      };
-    }
-
-    const ansiValue = result[0];
-    lastIndex = result.index + ansiValue.length;
-
-    yield {
-      text: input.slice(result.index, lastIndex),
-      type: "ansi"
-    };
-  }
-
-  if (lastIndex < input.length) {
-    yield {
-      text: input.slice(lastIndex, input.length),
-      type: "text"
-    };
+    return segments.map(
+      (segment) => (segment instanceof AnsiSegments ? segment : new AnsiSegments(segment))
+    );
   }
 }
