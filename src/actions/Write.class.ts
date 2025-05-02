@@ -1,4 +1,3 @@
-/* eslint-disable func-style */
 // Import Node.js Dependencies
 import timers from "node:timers/promises";
 
@@ -13,11 +12,11 @@ import { AnsiSegmenter } from "../index.js";
 import { AnsiSegments } from "../class/AnsiSegments.class.js";
 
 // CONSTANTS
-const kAnsiReset = `\x1b[0m`;
+const kAnsiReset = "\x1b[0m";
 
 export type WriteInput = {
   raw: string;
-}
+};
 
 export interface WriteOptions {
   interval?: number;

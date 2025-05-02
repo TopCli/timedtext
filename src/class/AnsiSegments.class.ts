@@ -1,5 +1,5 @@
 // Import Internal Dependencies
-import {
+import type {
   AnsiCode
 } from "../utils/extractAnsiCodesFromSegment.js";
 

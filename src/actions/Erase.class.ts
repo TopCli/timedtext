@@ -1,10 +1,10 @@
+// Import Third-party Dependencies
+import wcswidth from "@topcli/wcwidth";
+
 // Import Internal Dependencies
 import { Action } from "./Action.class.js";
 import { Write } from "./Write.class.js";
 import { Cursor } from "../cursor.js";
-
-// Import Third-party Dependencies
-import wcswidth from "@topcli/wcwidth";
 
 export type EraseOptions = {
   length?: number;

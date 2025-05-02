@@ -1,14 +1,11 @@
 // Import Node.js Dependencies
 import readline from "node:readline";
 import * as TTY from "node:tty";
+import { stripVTControlCharacters } from "node:util";
 
 // Import Third-party Dependencies
 import wcwidth from "@topcli/wcwidth";
 import getCursorPosition from "get-cursor-position";
-import ansiRegex from "ansi-regex";
-
-// CONSTANTS
-const kAnsiRegex = ansiRegex();
 
 export class Cursor {
   public x: number;
@@ -73,7 +70,7 @@ export class Cursor {
 
     const dy = (input.match(/\n/g) || "").length;
     this.y += dy;
-    this.x = dy === 0 ? this.x + wcwidth(input.replace(kAnsiRegex, "")) : 0;
+    this.x = dy === 0 ? this.x + wcwidth(stripVTControlCharacters(input)) : 0;
 
     return this.writeRaw(ansi + input);
   }

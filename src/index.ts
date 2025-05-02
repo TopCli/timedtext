@@ -4,10 +4,10 @@ import * as TTY from "node:tty";
 // Import Internal Dependencies
 import {
   Write,
-  WriteOptions,
+  type WriteOptions,
   Pause,
   Erase,
-  EraseOptions
+  type EraseOptions
 } from "./actions/index.js";
 import { Cursor } from "./cursor.js";
 import { AnsiSegmenter } from "./class/AnsiSegmenter.class.js";
@@ -25,7 +25,7 @@ export interface TimedTextOptions {
   segmenter?: SegmenterOptions;
 }
 
-export type WriteTextOptions = Omit<WriteOptions, "segmenter"> & { segmenter?: SegmenterOptions };
+export type WriteTextOptions = Omit<WriteOptions, "segmenter"> & { segmenter?: SegmenterOptions; };
 export type EraseTextOptions = EraseOptions;
 
 export class TimedText {

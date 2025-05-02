@@ -4,7 +4,7 @@ import ansiRegex from "ansi-regex";
 export type AnsiCode = {
   offset: number;
   value: string;
-}
+};
 
 export function extractAnsiCodesFromSegment(
   input: string
@@ -16,7 +16,6 @@ export function extractAnsiCodesFromSegment(
 
   for (
     let result: RegExpExecArray | null;
-    // eslint-disable-next-line no-cond-assign
     result = regexp.exec(input);
     result !== null
   ) {

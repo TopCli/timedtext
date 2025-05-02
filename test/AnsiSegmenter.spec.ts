@@ -1,12 +1,16 @@
 // Import Node.js Dependencies
 import assert from "node:assert";
 import { describe, it } from "node:test";
-
-// Import Third-party Dependencies
-import kleur from "kleur";
+import { styleText } from "node:util";
 
 // Import Internal Dependencies
 import { AnsiSegmenter } from "../src/class/AnsiSegmenter.class.js";
+
+// CONSTANTS
+const kCLIColor = {
+  blue: (text: string) => styleText("blue", text),
+  red: (text: string) => styleText("red", text)
+} as const satisfies Record<string, (text: string) => string>;
 
 describe("AnsiSegmenter", () => {
   describe("no ANSI characters", () => {
@@ -57,7 +61,7 @@ describe("AnsiSegmenter", () => {
         granularity: "word"
       });
 
-      const inputToSegment = kleur.blue("oh no!");
+      const inputToSegment = kCLIColor.blue("oh no!");
 
       const segments = segmenter.segment(inputToSegment)
         .map((segment) => segment.toString());
@@ -73,13 +77,13 @@ describe("AnsiSegmenter", () => {
         granularity: "word"
       });
 
-      const inputToSegment = kleur.blue(`ohhh${kleur.red("hhh")}`) + "yyy";
+      const inputToSegment = kCLIColor.blue(`ohhh${kCLIColor.red("hhh")}`) + "yyy";
       const segments = segmenter.segment(inputToSegment)
         .map((segment) => segment.toString());
 
       assert.deepEqual(
         segments,
-        ["\x1B[34mohhh\x1B[31mhhh\x1B[39m\x1B[34m\x1B[39myyy"]
+        ["\x1B[34mohhh\x1B[31mhhh\x1B[39m\x1B[39myyy"]
       );
     });
   });

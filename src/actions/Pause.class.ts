@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 // Import Node.js Dependencies
 import timers from "node:timers/promises";
 

@@ -1,18 +1,9 @@
 {
+  "extends": "@openally/config.typescript/esm",
   "compilerOptions": {
-    "declaration": true,
-    "strictNullChecks": true,
-    "target": "esnext",
     "outDir": "dist",
-    "module": "NodeNext",
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "skipDefaultLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "sourceMap": true,
     "rootDir": "./src",
-    "types": ["node"]
   },
-  "include": ["src", "src/schema/**/*.json"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }

@@ -2,7 +2,7 @@
 Animated TTY text
 
 ## Requirements
-- [Node.js](https://nodejs.org/en/) v18 or higher
+- [Node.js](https://nodejs.org/en/) v22 or higher
 
 ## Getting Started
 
