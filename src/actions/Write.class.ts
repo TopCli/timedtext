@@ -3,13 +3,12 @@ import timers from "node:timers/promises";
 
 // Import Third-party Dependencies
 import wcswidth from "@topcli/wcwidth";
+import { AnsiSegmenter, AnsiSegment } from "@topcli/ansi-segmenter";
 
 // Import Internal Dependencies
 import { Action } from "./Action.class.js";
-import { sleep } from "../utils.js";
 import { Cursor } from "../cursor.js";
-import { AnsiSegmenter } from "../index.js";
-import { AnsiSegments } from "../class/AnsiSegments.class.js";
+import * as utils from "../utils/index.js";
 
 // CONSTANTS
 const kAnsiReset = "\x1b[0m";
@@ -51,7 +50,7 @@ export class Write extends Action {
     }
   }
 
-  * getIterableSegments(): IterableIterator<AnsiSegments> {
+  * getIterableSegments(): IterableIterator<AnsiSegment> {
     for (const input of this.inputs) {
       yield* this.segmenter.segment(input.raw);
     }
@@ -65,7 +64,7 @@ export class Write extends Action {
 
   sleep() {
     if (this.interval > 0) {
-      sleep(this.interval);
+      utils.sleep(this.interval);
     }
   }
 
@@ -80,7 +79,7 @@ export class Write extends Action {
       const lastMemoizedAnsiCode = ansiCodesMemory.at(-1) ?? kAnsiReset;
       cursor.write(segment.toString(), lastMemoizedAnsiCode);
 
-      const lastSegmentAnsiCode = segment.last;
+      const lastSegmentAnsiCode = segment.codes.at(-1)?.value;
       if (lastSegmentAnsiCode) {
         ansiCodesMemory.push(lastSegmentAnsiCode);
       }
@@ -96,7 +95,7 @@ export class Write extends Action {
       const lastMemoizedAnsiCode = ansiCodesMemory.at(-1) ?? kAnsiReset;
       cursor.write(segment.toString(), lastMemoizedAnsiCode);
 
-      const lastSegmentAnsiCode = segment.last;
+      const lastSegmentAnsiCode = segment.codes.at(-1)?.value;
       if (lastSegmentAnsiCode) {
         ansiCodesMemory.push(lastSegmentAnsiCode);
       }

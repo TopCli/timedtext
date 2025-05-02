@@ -44,8 +44,8 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@topcli/ansi-segmenter": "^1.0.0",
     "@topcli/wcwidth": "^1.0.1",
-    "ansi-regex": "^6.1.0",
     "get-cursor-position": "^2.0.0"
   }
 }

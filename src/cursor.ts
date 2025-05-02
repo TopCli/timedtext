@@ -17,7 +17,9 @@ export class Cursor {
   };
   public output: TTY.WriteStream;
 
-  constructor(output: TTY.WriteStream) {
+  constructor(
+    output: TTY.WriteStream
+  ) {
     this.#getCursorPosition();
     this.birthLocation = {
       x: this.x,
@@ -47,13 +49,19 @@ export class Cursor {
     return this;
   }
 
-  moveTo(x = 0, y = 0) {
+  moveTo(
+    x = 0,
+    y = 0
+  ) {
     readline.moveCursor(this.output, x, y);
 
     return this;
   }
 
-  jumpTo(x = this.x, y = this.y) {
+  jumpTo(
+    x = this.x,
+    y = this.y
+  ) {
     readline.cursorTo(this.output, x, y);
 
     return this;
@@ -65,7 +73,10 @@ export class Cursor {
     return this;
   }
 
-  write(input: string, ansi = "") {
+  write(
+    input: string,
+    ansi = ""
+  ) {
     this.jumpTo();
 
     const dy = (input.match(/\n/g) || "").length;
@@ -75,7 +86,9 @@ export class Cursor {
     return this.writeRaw(ansi + input);
   }
 
-  erase(input: string) {
+  erase(
+    input: string
+  ) {
     this.jumpTo();
     const inputLength = wcwidth(input);
     this.x -= inputLength;
