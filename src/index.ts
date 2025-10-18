@@ -11,8 +11,8 @@ import {
   Pause,
   Erase,
   type EraseOptions
-} from "./actions/index.js";
-import { Cursor } from "./cursor.js";
+} from "./actions/index.ts";
+import { Cursor } from "./cursor.ts";
 
 export type SegmenterOptions = {
   local: Intl.LocalesArgument;

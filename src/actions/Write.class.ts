@@ -6,9 +6,9 @@ import wcswidth from "@topcli/wcwidth";
 import { AnsiSegmenter, AnsiSegment } from "@topcli/ansi-segmenter";
 
 // Import Internal Dependencies
-import { Action } from "./Action.class.js";
-import { Cursor } from "../cursor.js";
-import * as utils from "../utils/index.js";
+import { Action } from "./Action.class.ts";
+import { Cursor } from "../cursor.ts";
+import * as utils from "../utils/index.ts";
 
 // CONSTANTS
 const kAnsiReset = "\x1b[0m";

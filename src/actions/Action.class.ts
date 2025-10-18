@@ -1,5 +1,5 @@
 // Import Internal Dependencies
-import { Cursor } from "../cursor.js";
+import { Cursor } from "../cursor.ts";
 
 export abstract class Action {
   abstract readonly name: string;

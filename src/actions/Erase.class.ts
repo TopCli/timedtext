@@ -2,9 +2,9 @@
 import wcswidth from "@topcli/wcwidth";
 
 // Import Internal Dependencies
-import { Action } from "./Action.class.js";
-import { Write } from "./Write.class.js";
-import { Cursor } from "../cursor.js";
+import { Action } from "./Action.class.ts";
+import { Write } from "./Write.class.ts";
+import { Cursor } from "../cursor.ts";
 
 export type EraseOptions = {
   length?: number;

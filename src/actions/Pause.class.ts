@@ -2,9 +2,9 @@
 import timers from "node:timers/promises";
 
 // Import Internal Dependencies
-import { Action } from "./Action.class.js";
-import { Cursor } from "../cursor.js";
-import * as utils from "../utils/index.js";
+import { Action } from "./Action.class.ts";
+import { Cursor } from "../cursor.ts";
+import * as utils from "../utils/index.ts";
 
 export class Pause extends Action {
   public readonly name = "pause";

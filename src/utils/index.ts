@@ -1,1 +1,1 @@
-export * from "./sleepSync.js";
+export * from "./sleepSync.ts";
